@@ -1,13 +1,14 @@
-package vr.miniautorizador;
+package com.vr.miniautorizador;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
 class MiniautorizadorApplicationTests {
-//
-//    @Test
-//    void contextLoads() {
-//    }
+
+    @Test
+    void contextLoads() {
+
+    }
 
 }
