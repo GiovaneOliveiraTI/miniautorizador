@@ -21,15 +21,19 @@ public class CartaoService implements ICartaoService {
 
     private final CartaoValidation cartaoValidation;
 
+    private final CartaoQueryService cartaoQueryService;
+
     /**
      * Construtor que recebe o CartaoRepository.
      *
-     * @param cartaoRepository o repositório a ser utilizado pelo serviço.
+     * @param cartaoRepository   o repositório a ser utilizado pelo serviço.
      * @param cartaoValidation
+     * @param cartaoQueryService
      */
-    public CartaoService(CartaoRepository cartaoRepository, CartaoValidation cartaoValidation) {
+    public CartaoService(CartaoRepository cartaoRepository, CartaoValidation cartaoValidation, CartaoQueryService cartaoQueryService) {
         this.cartaoRepository = cartaoRepository;
         this.cartaoValidation = cartaoValidation;
+        this.cartaoQueryService = cartaoQueryService;
     }
 
     /**
@@ -59,11 +63,9 @@ public class CartaoService implements ICartaoService {
      * Obtém um Cartão pelo seu número.
      * @param numeroCartao o número do cartão a ser obtido.
      * @return o Cartão encontrado.
-     * @throws CartaoInexistenteException se o cartão não for encontrado.
      */
     private Cartao obterCartaoPorNumero(String numeroCartao) {
-        return cartaoRepository.findByNumeroCartao(numeroCartao)
-                .orElseThrow(() -> new CartaoInexistenteException(numeroCartao));
+        return cartaoQueryService.findByNumeroCartao(numeroCartao);
     }
 
     /**
