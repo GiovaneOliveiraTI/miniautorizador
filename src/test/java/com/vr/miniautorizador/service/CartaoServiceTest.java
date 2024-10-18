@@ -2,9 +2,9 @@ package com.vr.miniautorizador.service;
 
 import com.vr.miniautorizador.domain.Cartao;
 import com.vr.miniautorizador.dto.CartaoDTO;
-import com.vr.miniautorizador.exception.CartaoExistenteException;
 import com.vr.miniautorizador.exception.CartaoInexistenteException;
 import com.vr.miniautorizador.repository.CartaoRepository;
+import com.vr.miniautorizador.validation.CartaoValidation;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -16,14 +16,15 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class CartaoServiceTest {
 
     @Mock
     private CartaoRepository cartaoRepository;
+
+    @Mock
+    private CartaoValidation cartaoValidation;
 
     @InjectMocks
     private CartaoService cartaoService;
@@ -36,34 +37,29 @@ public class CartaoServiceTest {
     @Test
     public void testCriarCartao() {
         CartaoDTO cartaoDTO = new CartaoDTO("1234567890", "1234");
+        Cartao novoCartao = new Cartao(cartaoDTO.numeroCartao(), cartaoDTO.senha());
 
-        when(cartaoRepository.findByNumeroCartao(cartaoDTO.numeroCartao())).thenReturn(Optional.empty());
+        doNothing().when(cartaoValidation).verificarCartaoExistente(cartaoDTO.numeroCartao());
+        when(cartaoRepository.save(any(Cartao.class))).thenReturn(novoCartao);
 
         cartaoService.criarCartao(cartaoDTO);
 
-        verify(cartaoRepository).save(any(Cartao.class));
-    }
-
-    @Test
-    public void testCriarCartao_CartaoExistente() {
-        CartaoDTO cartaoDTO = new CartaoDTO("1234567890", "1234");
-        Cartao cartao = new Cartao(cartaoDTO.numeroCartao(), cartaoDTO.senha());
-
-        when(cartaoRepository.findByNumeroCartao(cartaoDTO.numeroCartao())).thenReturn(Optional.of(cartao));
-
-        assertThrows(CartaoExistenteException.class, () -> cartaoService.criarCartao(cartaoDTO));
+        verify(cartaoValidation, times(1)).verificarCartaoExistente(cartaoDTO.numeroCartao());
+        verify(cartaoRepository, times(1)).save(any(Cartao.class));
     }
 
     @Test
     public void testConsultarSaldo() {
         String numeroCartao = "1234567890";
+        BigDecimal saldo = new BigDecimal("1000.00");
         Cartao cartao = new Cartao(numeroCartao, "1234");
+        cartao.setSaldo(saldo);
 
         when(cartaoRepository.findByNumeroCartao(numeroCartao)).thenReturn(Optional.of(cartao));
 
         BigDecimal result = cartaoService.consultarSaldo(numeroCartao);
 
-        assertEquals(cartao.getSaldo(), result);
+        assertEquals(saldo, result);
     }
 
     @Test
@@ -77,17 +73,26 @@ public class CartaoServiceTest {
 
     @Test
     public void testDebitarSaldo() {
-        Cartao cartao = new Cartao("1234567890", "1234");
-        BigDecimal valor = new BigDecimal(100);
-        BigDecimal saldoInicial = cartao.getSaldo();
-        cartaoService.debitarSaldo(cartao, valor);
-        assertEquals(saldoInicial.subtract(valor), cartao.getSaldo());
+        String numeroCartao = "1234567890";
+        BigDecimal saldo = new BigDecimal("1000.00");
+        BigDecimal valorDebito = new BigDecimal("500.00");
+        Cartao cartao = new Cartao(numeroCartao, "1234");
+        cartao.setSaldo(saldo);
+
+        cartaoService.debitarSaldo(cartao, valorDebito);
+
+        assertEquals(saldo.subtract(valorDebito), cartao.getSaldo());
     }
 
     @Test
     public void testSalvarCartao() {
-        Cartao cartao = new Cartao("1234567890", "1234");
+        String numeroCartao = "1234567890";
+        Cartao cartao = new Cartao(numeroCartao, "1234");
+
+        when(cartaoRepository.save(cartao)).thenReturn(cartao);
+
         cartaoService.salvarCartao(cartao);
-        verify(cartaoRepository).save(any(Cartao.class));
+
+        verify(cartaoRepository, times(1)).save(cartao);
     }
 }

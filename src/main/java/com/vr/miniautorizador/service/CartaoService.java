@@ -5,6 +5,7 @@ import com.vr.miniautorizador.dto.CartaoDTO;
 import com.vr.miniautorizador.exception.CartaoExistenteException;
 import com.vr.miniautorizador.exception.CartaoInexistenteException;
 import com.vr.miniautorizador.repository.CartaoRepository;
+import com.vr.miniautorizador.validation.CartaoValidation;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -18,12 +19,17 @@ public class CartaoService implements ICartaoService {
 
     private final CartaoRepository cartaoRepository;
 
+    private final CartaoValidation cartaoValidation;
+
     /**
      * Construtor que recebe o CartaoRepository.
+     *
      * @param cartaoRepository o repositório a ser utilizado pelo serviço.
+     * @param cartaoValidation
      */
-    public CartaoService(CartaoRepository cartaoRepository) {
+    public CartaoService(CartaoRepository cartaoRepository, CartaoValidation cartaoValidation) {
         this.cartaoRepository = cartaoRepository;
+        this.cartaoValidation = cartaoValidation;
     }
 
     /**
@@ -32,22 +38,12 @@ public class CartaoService implements ICartaoService {
      * @throws CartaoExistenteException se o cartão já existir.
      */
     public void criarCartao(CartaoDTO cartaoDTO) {
-        verificarCartaoExistente(cartaoDTO.numeroCartao());
+        cartaoValidation.verificarCartaoExistente(cartaoDTO.numeroCartao());
         Cartao novoCartao = new Cartao(cartaoDTO.numeroCartao(), cartaoDTO.senha());
         cartaoRepository.save(novoCartao);
     }
 
-    /**
-     * Verifica se um Cartão com o número fornecido já existe.
-     * @param numeroCartao o número do cartão a ser verificado.
-     * @throws CartaoExistenteException se o cartão já existir.
-     */
-    private void verificarCartaoExistente(String numeroCartao) {
-        cartaoRepository.findByNumeroCartao(numeroCartao)
-                .ifPresent(cartao -> {
-                    throw new CartaoExistenteException(numeroCartao);
-                });
-    }
+
 
     /**
      * Consulta o saldo de um Cartão pelo seu número.

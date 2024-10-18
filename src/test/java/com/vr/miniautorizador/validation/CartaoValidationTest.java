@@ -1,10 +1,7 @@
 package com.vr.miniautorizador.validation;
 
 import com.vr.miniautorizador.domain.Cartao;
-import com.vr.miniautorizador.exception.CartaoInexistenteException;
-import com.vr.miniautorizador.exception.SaldoInsuficienteException;
-import com.vr.miniautorizador.exception.SenhaInvalidaException;
-import com.vr.miniautorizador.exception.ValorNegativoException;
+import com.vr.miniautorizador.exception.*;
 import com.vr.miniautorizador.repository.CartaoRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -59,6 +56,24 @@ public class CartaoValidationTest {
     public void testValidarSenha_Invalida() {
         Cartao cartao = new Cartao("123456789", "1234");
         assertThrows(SenhaInvalidaException.class, () -> cartaoValidation.validarSenha(cartao, "0000"));
+    }
+
+
+    @Test
+    public void testVerificarCartaoExistente_CartaoExistente() {
+        String numeroCartao = "123456789";
+        Cartao cartaoMock = new Cartao(numeroCartao, "1234");
+        when(cartaoRepository.findByNumeroCartao(numeroCartao)).thenReturn(Optional.of(cartaoMock));
+
+        assertThrows(CartaoExistenteException.class, () -> cartaoValidation.verificarCartaoExistente(numeroCartao));
+    }
+
+    @Test
+    public void testVerificarCartaoExistente_CartaoInexistente() {
+        String numeroCartao = "123456789";
+        when(cartaoRepository.findByNumeroCartao(numeroCartao)).thenReturn(Optional.empty());
+
+        assertDoesNotThrow(() -> cartaoValidation.verificarCartaoExistente(numeroCartao));
     }
 
     @Test

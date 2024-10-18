@@ -1,10 +1,7 @@
 package com.vr.miniautorizador.validation;
 
 import com.vr.miniautorizador.domain.Cartao;
-import com.vr.miniautorizador.exception.CartaoInexistenteException;
-import com.vr.miniautorizador.exception.SaldoInsuficienteException;
-import com.vr.miniautorizador.exception.SenhaInvalidaException;
-import com.vr.miniautorizador.exception.ValorNegativoException;
+import com.vr.miniautorizador.exception.*;
 import com.vr.miniautorizador.repository.CartaoRepository;
 import org.springframework.stereotype.Component;
 
@@ -72,5 +69,17 @@ public class CartaoValidation implements ICartaoValidation{
         if (cartao.getSaldo().compareTo(valor) < 0) {
             throw new SaldoInsuficienteException();
         }
+    }
+
+    /**
+     * Verifica se um Cartão com o número fornecido já existe.
+     * @param numeroCartao o número do cartão a ser verificado.
+     * @throws CartaoExistenteException se o cartão já existir.
+     */
+    public void verificarCartaoExistente(String numeroCartao) {
+        cartaoRepository.findByNumeroCartao(numeroCartao)
+                .ifPresent(cartao -> {
+                    throw new CartaoExistenteException(numeroCartao);
+                });
     }
 }
