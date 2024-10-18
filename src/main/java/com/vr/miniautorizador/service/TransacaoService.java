@@ -2,7 +2,7 @@ package com.vr.miniautorizador.service;
 
 import com.vr.miniautorizador.domain.Cartao;
 import com.vr.miniautorizador.dto.TransacaoDTO;
-import com.vr.miniautorizador.validator.ITransacaoValidator;
+import com.vr.miniautorizador.validation.ITransacaoValidation;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
@@ -13,20 +13,20 @@ import org.springframework.stereotype.Service;
 @Service
 public class TransacaoService {
 
-    private final ITransacaoValidator transacaoValidator;
+    private final ITransacaoValidation transacaoValidation;
     private final ICartaoQueryService cartaoQueryService;
     private final ICartaoService cartaoService;
 
     /**
      * Construtor para a classe TransacaoService.
      *
-     * @param transacaoValidator O validador de transações.
+     * @param transacaoValidation O validador de transações.
      * @param cartaoQueryService O serviço de consulta de cartões.
      * @param cartaoService O serviço de cartões.
      */
-    public TransacaoService(ITransacaoValidator transacaoValidator, ICartaoQueryService cartaoQueryService,
+    public TransacaoService(ITransacaoValidation transacaoValidation, ICartaoQueryService cartaoQueryService,
                             ICartaoService cartaoService) {
-        this.transacaoValidator = transacaoValidator;
+        this.transacaoValidation = transacaoValidation;
         this.cartaoQueryService = cartaoQueryService;
         this.cartaoService = cartaoService;
     }
@@ -54,7 +54,7 @@ public class TransacaoService {
      * @param transacaoDTO O DTO da transação a ser validada.
      */
     private void validarTransacao(TransacaoDTO transacaoDTO) {
-        transacaoValidator.validarTransacao(transacaoDTO);
+        transacaoValidation.validarTransacao(transacaoDTO);
     }
 
     /**

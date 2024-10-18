@@ -2,7 +2,7 @@ package com.vr.miniautorizador.service;
 
 import com.vr.miniautorizador.domain.Cartao;
 import com.vr.miniautorizador.dto.TransacaoDTO;
-import com.vr.miniautorizador.validator.ITransacaoValidator;
+import com.vr.miniautorizador.validation.ITransacaoValidation;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -17,7 +17,7 @@ import static org.mockito.Mockito.when;
 public class TransacaoServiceTest {
 
     @Mock
-    private ITransacaoValidator transacaoValidator;
+    private ITransacaoValidation transacaoValidation;
 
     @Mock
     private ICartaoQueryService cartaoQueryService;
@@ -42,7 +42,7 @@ public class TransacaoServiceTest {
 
         transacaoService.realizarTransacao(transacaoDTO);
 
-        verify(transacaoValidator).validarTransacao(transacaoDTO);
+        verify(transacaoValidation).validarTransacao(transacaoDTO);
         verify(cartaoService).debitarSaldo(cartao, transacaoDTO.valor());
         verify(cartaoService).salvarCartao(cartao);
     }

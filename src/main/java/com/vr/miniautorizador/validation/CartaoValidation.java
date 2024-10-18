@@ -1,10 +1,9 @@
-package com.vr.miniautorizador.validator;
+package com.vr.miniautorizador.validation;
 
-import com.vr.miniautorizador.exception.SaldoInsuficienteException;
-import com.vr.miniautorizador.dto.TransacaoDTO;
-import com.vr.miniautorizador.exception.CartaoInexistenteException;
-import com.vr.miniautorizador.exception.SenhaInvalidaException;
 import com.vr.miniautorizador.domain.Cartao;
+import com.vr.miniautorizador.exception.CartaoInexistenteException;
+import com.vr.miniautorizador.exception.SaldoInsuficienteException;
+import com.vr.miniautorizador.exception.SenhaInvalidaException;
 import com.vr.miniautorizador.exception.ValorNegativoException;
 import com.vr.miniautorizador.repository.CartaoRepository;
 import org.springframework.stereotype.Component;
@@ -12,33 +11,21 @@ import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 
 /**
- * Validador de transações.
- * Esta classe é responsável por validar as transações antes de serem processadas.
+ * Validation de cartao.
+ * Esta classe é responsável por validar a informacoes de cartao.
  */
 @Component
-public class TransacaoValidator implements ITransacaoValidator {
+public class CartaoValidation implements ICartaoValidation{
 
     private final CartaoRepository cartaoRepository;
 
     /**
-     * Construtor para a classe TransacaoValidator.
+     * Construtor para a classe cartaoValidation.
      *
      * @param cartaoRepository O repositório de cartões.
      */
-    public TransacaoValidator(CartaoRepository cartaoRepository) {
+    public CartaoValidation(CartaoRepository cartaoRepository) {
         this.cartaoRepository = cartaoRepository;
-    }
-
-    /**
-     * Valida a transação.
-     * Este método valida a senha, o saldo e a existência do cartão.
-     *
-     * @param transacaoDTO O DTO da transação a ser validada.
-     */
-    public void validarTransacao(TransacaoDTO transacaoDTO) {
-        Cartao cartao = obterCartao(transacaoDTO.numeroCartao());
-        validarSenha(cartao, transacaoDTO.senha());
-        validarSaldo(cartao, transacaoDTO.valor());
     }
 
     /**
@@ -49,7 +36,7 @@ public class TransacaoValidator implements ITransacaoValidator {
      * @return O cartão encontrado.
      * @throws CartaoInexistenteException Se nenhum cartão com o número fornecido for encontrado.
      */
-    private Cartao obterCartao(String numeroCartao) {
+    public Cartao obterCartao(String numeroCartao) {
         return cartaoRepository.findByNumeroCartao(numeroCartao)
                 .orElseThrow(() -> new CartaoInexistenteException(numeroCartao));
     }
@@ -62,7 +49,7 @@ public class TransacaoValidator implements ITransacaoValidator {
      * @param senha A senha a ser validada.
      * @throws SenhaInvalidaException Se a senha fornecida não for igual à senha do cartão.
      */
-    private void validarSenha(Cartao cartao, String senha) {
+    public void validarSenha(Cartao cartao, String senha) {
         if (!cartao.getSenha().equals(senha)) {
             throw new SenhaInvalidaException();
         }
@@ -77,7 +64,7 @@ public class TransacaoValidator implements ITransacaoValidator {
      * @throws ValorNegativoException Se o valor da transação for negativo.
      * @throws SaldoInsuficienteException Se o saldo do cartão for insuficiente para a transação.
      */
-    private void validarSaldo(Cartao cartao, BigDecimal valor) {
+    public void validarSaldo(Cartao cartao, BigDecimal valor) {
         if (valor.compareTo(BigDecimal.ZERO) < 0) {
             throw new ValorNegativoException();
         }
