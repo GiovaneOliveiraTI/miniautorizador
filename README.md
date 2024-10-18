@@ -25,7 +25,7 @@ Ela é projetada para lidar com operações relacionadas a cartões de crédito.
 
 ## Configuração
 
-Para executar este projeto, você precisa ter o Java 17, Maven e docker instalados em sua máquina.
+Para executar este projeto, você precisa ter o Java 17, Maven, docker  e postman(ou outra ferramenta de sua Preferência) instalados em sua máquina.
 
 1. Clone o repositório
 2. Navegue até o diretório do projeto
